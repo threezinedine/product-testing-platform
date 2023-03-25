@@ -12,12 +12,14 @@ from app.cores.constants import (
 )
 from app.cores.interfaces import IApplication
 from app.cores.apis import (
+    AddObserverAPI,
     ChangeVariableValueAPI,
     CreateNewVariableAPI,
     RaiseErrorAPI,
     RemoveVariableAPI,
 )
 from app.cores.apis import IAPI
+from app.utils.interfaces import IObserver
 
 
 TEST_VARIABLE_NAME = 'test_variable'
@@ -95,6 +97,16 @@ class TestErrorApplication(TestApplication):
         return TEST_ERROR_APPLICATION_NAME
 
 
+class ObserverTest(IObserver):
+    def __init__(self, value: str):
+        self.__value = value
+        self.value_changed = False
+
+    def update(self, publisher, data):
+        print("Here", publisher.value, self.__value)
+        self.value_changed = publisher.value == self.__value
+
+
 class SystemTest(unittest.TestCase):
     def setUp(self):
         self.applications = [
@@ -143,8 +155,19 @@ class SystemTest(unittest.TestCase):
 
         self.system.variables[TEST_VARIABLE_NAME].value == TEST_VARIABLE_NEW_VALUE
 
-    # @unittest.skip("Not implemented yet.")
     def test_stop_application_when_error_occurs(self):
         self.system.runApplication(TEST_ERROR_APPLICATION_NAME)
 
         self.system.variables[ERROR_VARIABLE_NAME].value == Error.TYPE_MISS_MATCH
+
+    def test_assign_observer_for_variable(self):
+        self.create_new_variable()
+        observer = ObserverTest(Error.TYPE_MISS_MATCH.value)
+
+        self.system.runAPI(AddObserverAPI.__name__,
+                           ERROR_VARIABLE_NAME, observer)
+
+        self.system.runAPI(ChangeVariableValueAPI.__name__,
+                           TEST_VARIABLE_NAME, TEST_VARIABLE_STRING_INTIAL_VALUE)
+
+        self.assertTrue(observer.value_changed)

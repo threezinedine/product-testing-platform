@@ -53,3 +53,5 @@ class Variable(PublisherBase):
         else:
             system.runAPI('RaiseErrorAPI',
                           Error.TYPE_MISS_MATCH)
+
+        self.notify()

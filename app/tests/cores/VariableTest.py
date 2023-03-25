@@ -1,12 +1,11 @@
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, create_autospec
 
 from app.cores import (
     Variable,
     VariableType,
     Error,
 )
-from app.cores.apis.raise_error_api import RaiseErrorAPI
 from app.cores.interfaces import ISystem
 from app.cores.constants import (
     TYPE_KEY,
@@ -40,7 +39,8 @@ def change_variable_value_miss_value(data: dict) -> None:
 
 class VariableTest(unittest.TestCase):
     def setUp(self):
-        self.system = Mock(ISystem)
+        self.system = Mock(spec=ISystem)
+        self.system.runAPI = Mock()
 
     def test_variable_name(self):
         variable = Variable(TEST_VARIABLE_NAME)
@@ -103,7 +103,7 @@ class VariableTest(unittest.TestCase):
         variable.act(change_variable_value_string, self.system)
 
         self.system.runAPI.assert_called_once_with(
-            RaiseErrorAPI.__name__, Error.TYPE_MISS_MATCH)
+            'RaiseErrorAPI', Error.TYPE_MISS_MATCH)
 
     def test_if_assign_variable_with_miss_value_then_raise_error(self):
         variable = Variable(TEST_VARIABLE_NAME, TEST_VARIABLE_NUMBER_VALUE)
@@ -111,7 +111,7 @@ class VariableTest(unittest.TestCase):
         variable.act(change_variable_value_miss_value, self.system)
 
         self.system.runAPI.assert_called_once_with(
-            RaiseErrorAPI.__name__, Error.VALUE_IS_NONE)
+            'RaiseErrorAPI', Error.VALUE_IS_NONE)
 
     def test_if_assign_variable_with_miss_type_then_raise_error(self):
         variable = Variable(TEST_VARIABLE_NAME, TEST_VARIABLE_NUMBER_VALUE)
@@ -119,4 +119,4 @@ class VariableTest(unittest.TestCase):
         variable.act(change_variable_value_miss_type, self.system)
 
         self.system.runAPI.assert_called_once_with(
-            RaiseErrorAPI.__name__, Error.TYPE_IS_NONE)
+            'RaiseErrorAPI', Error.TYPE_IS_NONE)
