@@ -34,8 +34,6 @@ class System:
             *args, variables=deepcopy(self.__variables),
             system=self, **kwargs)
 
-        print(self.__variables, new_variables_dict, api_class_name)
-
         self.__variables = new_variables_dict
 
     @property

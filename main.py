@@ -1,40 +1,55 @@
+import numpy as np
+from typing import List
+from app.cores.constants import (
+    API_KEY,
+    ARGS_KEY,
+    EMPTY_DICT,
+    KWARGS_KEY,
+)
+from app.cores import System
 from app.utils.base import PublisherBase
 from app.utils.interfaces import (
     IObserver,
     IPublisher,
 )
+from app.cores.interfaces import (
+    IAPI,
+    IApplication,
+)
 
 
-class ConsoleObserver(IObserver):
-    def update(self, publisher: 'IPublisher', data: dict) -> None:
-        print(data)
+class Application(IApplication):
+    @property
+    def name(self) -> str:
+        return 'Application'
 
+    @property
+    def icon(self) -> np.ndarray:
+        return np.zeros((10, 10, 3), dtype=np.uint8)
 
-class ConsoleBeautyObserver(IObserver):
-    def update(self, publisher: 'IPublisher', data: dict) -> None:
-        print('Name changed to: {}'.format(data['name']))
-
-
-class NameVariablePublisher(PublisherBase):
-    def __init__(self):
-        super().__init__()
-        self._dict['name'] = 'John'
-
-    def set_name(self, name: str) -> None:
-        self._dict['name'] = name
-        self.notify()
+    @property
+    def apis(self) -> List['IAPI']:
+        return [
+            {
+                API_KEY: 'CreateNewVariableAPI',
+                ARGS_KEY: [
+                    'test_variable',
+                ],
+                KWARGS_KEY: dict(
+                    initial_value=1,
+                ),
+            },
+            {
+                API_KEY: 'ChangeVariableValueAPI',
+                ARGS_KEY: [
+                    'test_variable',
+                    'string',
+                ],
+                KWARGS_KEY: EMPTY_DICT,
+            },
+        ]
 
 
 if __name__ == '__main__':
-    variable = NameVariablePublisher()
-    observer = ConsoleObserver()
-    beauty_observer = ConsoleBeautyObserver()
-    variable.add_observer(observer)
-    variable.add_observer(beauty_observer)
-
-    variable.set_name('John')
-    variable.set_name('Jane')
-
-    variable.remove_observer(observer)
-
-    variable.set_name('John')
+    system = System([Application()])
+    system.runApplication('Application')

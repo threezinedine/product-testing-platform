@@ -12,7 +12,7 @@ class VariableType:
     def get_type_of_value(value: object):
         if isinstance(value, int) or isinstance(value, float):
             return VariableType.NUMBER
-        elif isinstance(value, str):
+        elif isinstance(value, str) or isinstance(value, VariableType):
             return VariableType.STRING
         else:
             return VariableType.OBJECT

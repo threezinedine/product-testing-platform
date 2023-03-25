@@ -4,14 +4,14 @@ from app.cores.interfaces import (
     IAPI,
     ISystem,
 )
+from app.cores import Error
 
 
 class RaiseErrorAPI(IAPI):
-    def run(self, errorStr: str, system: 'ISystem' = None, **kwargs) -> None:
-        api = ChangeVariableValueAPI()
-        return api.run(
+    def run(self, errorStr: Error, system: 'ISystem' = None, **kwargs) -> None:
+        return ChangeVariableValueAPI().run(
             variable_name=ERROR_VARIABLE_NAME,
-            new_value=errorStr,
+            new_value=errorStr.value,
             system=system,
             variables=system.variables,
         )

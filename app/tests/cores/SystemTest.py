@@ -2,10 +2,11 @@ import unittest
 import numpy as np
 from typing import List
 
-from app.cores import System
+from app.cores import System, Error
 from app.cores.constants import (
     API_KEY,
     ARGS_KEY,
+    EMPTY_DICT,
     ERROR_VARIABLE_NAME,
     KWARGS_KEY,
 )
@@ -27,6 +28,7 @@ TEST_VARIABLE_STRING_NAME = 'test_variable_string'
 TEST_VARIABLE_STRING_INTIAL_VALUE = 'test'
 
 TEST_APPLICATION_NAME = 'TestApplication'
+TEST_ERROR_APPLICATION_NAME = 'TestErrorApplication'
 
 TEST_ERROR_STRING = 'test_error string'
 
@@ -65,10 +67,39 @@ class TestApplication(IApplication):
         return np.zeros((1, 1, 3), dtype=np.uint8)
 
 
+class TestErrorApplication(TestApplication):
+    @property
+    def apis(self) -> List[IAPI]:
+        return [
+            {
+                API_KEY: 'CreateNewVariableAPI',
+                ARGS_KEY: [
+                    'test_variable',
+                ],
+                KWARGS_KEY: dict(
+                    initial_value=1,
+                ),
+            },
+            {
+                API_KEY: 'ChangeVariableValueAPI',
+                ARGS_KEY: [
+                    'test_variable',
+                    'string',
+                ],
+                KWARGS_KEY: EMPTY_DICT,
+            },
+        ]
+
+    @property
+    def name(self) -> str:
+        return TEST_ERROR_APPLICATION_NAME
+
+
 class SystemTest(unittest.TestCase):
     def setUp(self):
         self.applications = [
             TestApplication(),
+            TestErrorApplication(),
         ]
         self.system = System(self.applications)
 
@@ -100,10 +131,9 @@ class SystemTest(unittest.TestCase):
         self.system.variables[TEST_VARIABLE_STRING_NAME].value == TEST_VARIABLE_STRING_INTIAL_VALUE
 
     def test_system_raise_error(self):
-        self.system.runAPI(RaiseErrorAPI.__name__, TEST_ERROR_STRING)
+        self.system.runAPI(RaiseErrorAPI.__name__, Error.TYPE_MISS_MATCH)
 
-        print(self.system.variables)
-        self.system.variables[ERROR_VARIABLE_NAME].value == TEST_ERROR_STRING
+        self.system.variables[ERROR_VARIABLE_NAME].value == Error.TYPE_MISS_MATCH.value
 
     def test_change_value_value(self):
         self.create_new_variable()
@@ -112,3 +142,9 @@ class SystemTest(unittest.TestCase):
                            TEST_VARIABLE_NAME, TEST_VARIABLE_NEW_VALUE)
 
         self.system.variables[TEST_VARIABLE_NAME].value == TEST_VARIABLE_NEW_VALUE
+
+    # @unittest.skip("Not implemented yet.")
+    def test_stop_application_when_error_occurs(self):
+        self.system.runApplication(TEST_ERROR_APPLICATION_NAME)
+
+        self.system.variables[ERROR_VARIABLE_NAME].value == Error.TYPE_MISS_MATCH
