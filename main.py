@@ -18,6 +18,11 @@ from app.cores.interfaces import (
 )
 
 
+class ConsoleLog(IObserver):
+    def update(self, publisher: 'IPublisher', data: dict) -> None:
+        print(publisher.value)
+
+
 class Application(IApplication):
     @property
     def name(self) -> str:
@@ -40,10 +45,34 @@ class Application(IApplication):
                 ),
             },
             {
+                API_KEY: 'AddObserverAPI',
+                ARGS_KEY: [
+                    'error',
+                    ConsoleLog(),
+                ],
+                KWARGS_KEY: EMPTY_DICT,
+            },
+            {
+                API_KEY: 'AddObserverAPI',
+                ARGS_KEY: [
+                    'test_variable',
+                    ConsoleLog(),
+                ],
+                KWARGS_KEY: EMPTY_DICT,
+            },
+            {
                 API_KEY: 'ChangeVariableValueAPI',
                 ARGS_KEY: [
                     'test_variable',
                     'string',
+                ],
+                KWARGS_KEY: EMPTY_DICT,
+            },
+            {
+                API_KEY: 'ChangeVariableValueAPI',
+                ARGS_KEY: [
+                    'test_variable',
+                    30.5,
                 ],
                 KWARGS_KEY: EMPTY_DICT,
             },
