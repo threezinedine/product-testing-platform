@@ -2,12 +2,12 @@ import numpy as np
 from typing import List
 from abc import ABC, abstractproperty, abstractmethod
 
-from app.cores.apis import IAPI
+from app.cores.interfaces.IAPI import IAPI
 
 
 class IApplication(ABC):
     @abstractproperty
-    def apis(self) -> List[IAPI]:
+    def apis(self) -> List['IAPI']:
         raise NotImplementedError
 
     @abstractproperty

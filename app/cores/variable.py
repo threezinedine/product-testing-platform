@@ -5,6 +5,8 @@ from app.cores.constants import (
     VALUE_KEY,
 )
 from app.cores.variable_type import VariableType
+from app.cores.interfaces import ISystem
+from app.cores import Error
 from app.utils.base import PublisherBase
 from app.utils.interfaces import (
     IObserver,
@@ -30,10 +32,16 @@ class Variable(PublisherBase):
     def value(self) -> object:
         return self._dict[VALUE_KEY]
 
-    def act(self, func) -> None:
+    def act(self, func, system: 'ISystem') -> None:
         new_dict = func(deepcopy(self._dict))
 
-        if VALUE_KEY not in new_dict.keys() or TYPE_KEY not in new_dict.keys():
+        if VALUE_KEY not in new_dict.keys():
+            system.runAPI('RaiseErrorAPI',
+                          Error.VALUE_IS_NONE)
+            return
+        elif TYPE_KEY not in new_dict.keys():
+            system.runAPI('RaiseErrorAPI',
+                          Error.TYPE_IS_NONE)
             return
 
         if self.type == VariableType.OBJECT:
@@ -42,3 +50,6 @@ class Variable(PublisherBase):
             self._dict = new_dict
         elif VariableType.get_type_of_value(new_dict[VALUE_KEY]) == self.type:
             self._dict = new_dict
+        else:
+            system.runAPI('RaiseErrorAPI',
+                          Error.TYPE_MISS_MATCH)
