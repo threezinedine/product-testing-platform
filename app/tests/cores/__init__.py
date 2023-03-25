@@ -1,1 +1,2 @@
-from .VariableTest import VariableTest
+from .VariableTest import *
+from .SystemTest import *
