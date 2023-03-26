@@ -16,17 +16,18 @@ from app.cores.apis import *
 
 class System:
     def __init__(self, applications: List['IApplication'] = EMPTY_LIST) -> None:
-        self.__application = applications
+        self.__applications = {
+            application.name: application
+            for application in applications
+        }
         self.__variables = {
             ERROR_VARIABLE_NAME: Variable(ERROR_VARIABLE_NAME, EMPTY_STRING),
         }
 
     def runApplication(self, application_name: str) -> None:
-        for application in self.__application:
-            if application.name == application_name:
-                for api in application.apis:
-                    self.runAPI(api[API_KEY], *api[ARGS_KEY],
-                                **api[KWARGS_KEY])
+        for api in self.__applications[application_name].apis:
+            self.runAPI(api[API_KEY], *api[ARGS_KEY],
+                        **api[KWARGS_KEY])
 
     def runAPI(self, api_class_name: str, *args, **kwargs) -> None:
         api = globals()[api_class_name]()
