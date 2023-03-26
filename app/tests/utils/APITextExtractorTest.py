@@ -202,3 +202,18 @@ class APITextExtractorTest(unittest.TestCase):
         )
 
         apis = extractor.apis
+
+    def test_extract_array_args(self):
+        extractor = APITextExtractor(
+            'CreateNewVariableAPI [1, 2, 3]')
+
+        apis = extractor.apis
+
+        self.assertDictEqual(
+            apis[0],
+            {
+                API_KEY: 'CreateNewVariableAPI',
+                ARGS_KEY: [[1, 2, 3]],
+                KWARGS_KEY: EMPTY_DICT,
+            }
+        )
