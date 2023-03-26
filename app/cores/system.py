@@ -20,23 +20,43 @@ class System:
             application.name: application
             for application in applications
         }
-        self.__variables = {
-            ERROR_VARIABLE_NAME: Variable(ERROR_VARIABLE_NAME, EMPTY_STRING),
-        }
+        self.__error = Variable(ERROR_VARIABLE_NAME, EMPTY_STRING)
+        self.__variables = EMPTY_DICT
 
     def runApplication(self, application_name: str) -> None:
+        if application_name not in self.__applications.keys():
+            self.runAPI('RaiseErrorAPI', Error.APPLICATION_NOT_FOUND)
+            return
+
         for api in self.__applications[application_name].apis:
             self.runAPI(api[API_KEY], *api[ARGS_KEY],
                         **api[KWARGS_KEY])
 
     def runAPI(self, api_class_name: str, *args, **kwargs) -> None:
         api = globals()[api_class_name]()
+
         new_variables_dict = api.run(
-            *args, variables=deepcopy(self.__variables),
+            *args,
+            variables=self.__get_copy_variables(),
             system=self, **kwargs)
 
         self.__variables = new_variables_dict
 
+    def __get_copy_variables(self) -> dict:
+        return {
+            variable_name: variable
+            for variable_name, variable in self.__variables.items()
+        }
+
+    def raiseError(self, error: Error) -> None:
+        def raiseErrorFunc(data: dict):
+            data[VALUE_KEY] = error.value
+            return data
+
+        self.__error.act(raiseErrorFunc, self)
+
     @property
     def variables(self) -> dict:
-        return self.__variables
+        variables = deepcopy(self.__variables)
+        variables[ERROR_VARIABLE_NAME] = self.__error
+        return variables

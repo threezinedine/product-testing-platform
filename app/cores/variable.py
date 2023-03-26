@@ -1,4 +1,4 @@
-from copy import deepcopy
+from copy import deepcopy, copy
 
 from app.cores.constants import (
     TYPE_KEY,
@@ -55,3 +55,6 @@ class Variable(PublisherBase):
                           Error.TYPE_MISS_MATCH)
 
         self.notify()
+
+    def __repr__(self) -> str:
+        return f'<Variable name={self.name} value={self.value} type={self.type}/>'
