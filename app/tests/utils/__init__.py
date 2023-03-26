@@ -1,1 +1,2 @@
 from .PublisherBaseTest import PublisherBaseTest
+from .APITextExtractorTest import APITextExtractorTest

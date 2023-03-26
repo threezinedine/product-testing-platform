@@ -1,0 +1,2 @@
+CreateNewVariableAPI test_variable -initial_value string
+LoadImageFromFileAPI test_image C:\Users\Acer\PycharmProjects\product-testing-platform\app\tests\assets\flow-chart.png

@@ -1,0 +1,2 @@
+CreateNewVariableAPI test_variable -initial_value 0
+ChangeVariableValueAPI test_variable 23.45
