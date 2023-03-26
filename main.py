@@ -79,6 +79,15 @@ class Application(IApplication):
         ]
 
 
+EMPTY_LIST = []
+args = EMPTY_LIST
+
+args.append(23)
+
+new_args = EMPTY_LIST
+new_args.append(23)
+
+
 if __name__ == '__main__':
     system = System([Application()])
     system.runApplication('Application')
