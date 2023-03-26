@@ -22,6 +22,9 @@ class APIObserverTest(unittest.TestCase):
         publisher.add_observer(observerAPI)
 
         publisher.notify()
+        publisher.notify()
 
-        system.runAPI.assert_called_once_with(
+        system.runAPI.assert_called_with(
             API_NAME, *API_ARGS, **API_KWARGS)
+
+        self.assertEqual(system.runAPI.call_count, 2)
